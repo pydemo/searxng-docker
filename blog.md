@@ -187,6 +187,91 @@ Always restart services after making configuration changes to ensure they take e
 - Set up log rotation to prevent disk space issues
 - Consider implementing monitoring alerts for container failures
 
+## Step 11: Creating a Personal Fork for Configuration Management
+
+After successfully fixing the SearXNG service, it's important to preserve our custom configurations. Rather than losing our changes or having them overwritten by upstream updates, we created a personal fork of the repository.
+
+### Setting Up the Fork
+
+First, we renamed the original remote to `upstream` to preserve the connection to the official repository:
+
+```bash
+git remote rename origin upstream
+```
+
+Then we added our personal GitHub repository as the new `origin`:
+
+```bash
+git remote add origin https://github.com/pydemo/searxng-docker.git
+```
+
+### Committing Our Changes
+
+We checked the current status to see what files had been modified:
+
+```bash
+git status
+```
+
+**Files Modified:**
+- `.env` - Environment configuration
+- `docker-compose.yaml` - Docker service definitions  
+- `searxng/limiter.toml` - Rate limiting configuration
+- `searxng/settings.yml` - Main SearXNG settings (including our secure secret key)
+
+**New Files:**
+- `blog.md` - This troubleshooting documentation
+
+We staged all changes and committed them:
+
+```bash
+git add .
+git commit -m "My custom changes to searxng-docker"
+```
+
+Finally, we pushed our changes to our personal fork:
+
+```bash
+git push -u origin master
+```
+
+### Benefits of Forking
+
+Creating a personal fork provides several advantages:
+
+1. **Configuration Preservation**: Our custom settings are safely stored and version-controlled
+2. **Easy Deployment**: We can clone our fork on other systems with our configurations intact
+3. **Update Management**: We can selectively merge updates from upstream while preserving our customizations
+4. **Collaboration**: Team members can use the same tested configuration
+5. **Rollback Capability**: We can easily revert to working configurations if needed
+
+### Keep Upstream in Sync (Optional but Recommended)
+
+So you can pull new updates from the original repo later:
+
+```bash
+# fetch updates from original repo
+git fetch upstream
+
+# merge/rebase into your branch when needed
+git merge upstream/master
+```
+
+### Future Maintenance
+
+To keep our fork updated with upstream changes while preserving our customizations:
+
+```bash
+# Fetch updates from upstream
+git fetch upstream
+
+# Merge upstream changes (resolve conflicts if needed)
+git merge upstream/master
+
+# Push updated fork
+git push origin master
+```
+
 ## Conclusion
 
 This troubleshooting session demonstrates the importance of systematic problem-solving when dealing with containerized applications. By following a logical progression from symptom identification to root cause analysis and finally to solution implementation, we successfully resolved both the container crashes and rate limiting issues.
@@ -195,8 +280,11 @@ The key takeaways are:
 1. **Secret key misconfiguration** was the primary cause of container crashes
 2. **Rate limiting** was preventing normal usage even after the service started
 3. **Proper configuration management** is essential for reliable service operation
+4. **Version control** helps preserve working configurations and enables easy deployment
 
 SearXNG is now running successfully and providing search results from multiple engines while maintaining user privacy. The service is accessible via both the web interface at `http://localhost:8080/` and the JSON API at `http://localhost:8080/search?q=QUERY&format=json`.
+
+Our custom configuration is now safely stored in a personal fork at `https://github.com/pydemo/searxng-docker.git`, making it easy to deploy the same working setup on other systems or share with team members.
 
 For production deployments, remember to re-enable and properly configure rate limiting to protect against abuse while ensuring legitimate users can access the service effectively.
 
